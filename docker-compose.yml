@@ -1,0 +1,22 @@
+version: '3'
+networks:
+  backend:
+services:
+  api:
+    hostname: doc_recognizer
+    container_name: doc_recognizer
+    build: api/
+    environment:
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+    restart: always
+    runtime: nvidia
+    ports:
+      - "9001:9001"
+    logging:
+      options:
+        max-size: 50m
+    networks:
+      - backend
