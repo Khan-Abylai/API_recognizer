@@ -36,20 +36,23 @@ def getPlates(img_orig, img_model, ax, ay):
             box[:, ::2] -= ax
             box[:, 1::2] -= ay
 
-            # Обработка номера
             plate_img = preprocess_image_recognizer(img_orig, box)
             plate_labels, probs = recognizer.predict(plate_img)
 
-            # Сохраняем результат
+            # Определение типа объекта
+            label = plate_labels[0] if isinstance(plate_labels, list) and plate_labels else ""
+            obj_type = "id" if label.isdigit() else "date of birth"
+
             results.append({
                 "label": plate_labels,
+                "type": obj_type,
                 "prob": probs,
-                "lp_coords": {
-                    "center_x": str(box[0][0]), "center_y": str(box[0][1]), "plate_w": str(box[1][0]),
-                        "plate_h": str(box[1][1]), "left_top_x": str(box[2][0]), "left_top_y": str(box[2][1]),
-                        "left_bottom_x": str(box[3][0]), "left_bottom_y": str(box[3][1]), "right_top_x": str(box[4][0]),
-                        "right_top_y": str(box[4][1]), "right_bottom_x": str(box[5][0]),
-                        "right_bottom_y": str(box[5][1])
+                "coords": {
+                    "center_x": str(box[0][0]), "center_y": str(box[0][1]), "width": str(box[1][0]),
+                    "height": str(box[1][1]), "left_top_x": str(box[2][0]), "left_top_y": str(box[2][1]),
+                    "left_bottom_x": str(box[3][0]), "left_bottom_y": str(box[3][1]), "right_top_x": str(box[4][0]),
+                    "right_top_y": str(box[4][1]), "right_bottom_x": str(box[5][0]),
+                    "right_bottom_y": str(box[5][1])
                 }
             })
 
