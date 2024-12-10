@@ -44,9 +44,9 @@ def getPlates(img_orig, img_model, ax, ay):
             results.append({
                 "label": plate_labels,
                 "prob": probs,
-                "coords": {
-                    "center_x": str(box[0][0]), "center_y": str(box[0][1]), "width": str(box[1][0]),
-                        "height": str(box[1][1]), "left_top_x": str(box[2][0]), "left_top_y": str(box[2][1]),
+                "lp_coords": {
+                    "center_x": str(box[0][0]), "center_y": str(box[0][1]), "plate_w": str(box[1][0]),
+                        "plate_h": str(box[1][1]), "left_top_x": str(box[2][0]), "left_top_y": str(box[2][1]),
                         "left_bottom_x": str(box[3][0]), "left_bottom_y": str(box[3][1]), "right_top_x": str(box[4][0]),
                         "right_top_y": str(box[4][1]), "right_bottom_x": str(box[5][0]),
                         "right_bottom_y": str(box[5][1])
@@ -57,7 +57,7 @@ def getPlates(img_orig, img_model, ax, ay):
 
 
 def readb64(uri):
-    nparr = np.frombuffer(uri, np.uint8)  # Исправлено: устаревший метод np.fromstring заменён на np.frombuffer
+    nparr = np.frombuffer(uri, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     return img
 

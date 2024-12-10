@@ -8,7 +8,7 @@ from scipy.special import expit as sigmoid
 
 
 class DetectionEngine(object):
-    __MODELS_PATH = "./models/detector.np"
+    __MODELS_PATH = "../../../../../Project_iman/API_recognizer/api/src/models/detector_weights.np"
     __ENGINE_NAME = 'detection.engine'
 
     def __init__(self, img_w=512, img_h=512, grid_size=16):

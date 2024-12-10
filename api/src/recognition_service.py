@@ -8,11 +8,12 @@ import constants
 
 class RecognitionEngine(object):
     __ENGINE_NAME = 'recognizer.engine'
-    __MODELS_PATH = "./models/recognition_weights.np"
+    __MODELS_PATH = "../../../../../Project_iman/API_recognizer/api/src/models/recognizer_lite.np"
+    __russian_alphabet = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
 
     def __init__(self, max_batch_size=2):
 
-        self.ALPHABET = '-' + string.digits + string.ascii_lowercase
+        self.ALPHABET = '-' + string.digits + self.__russian_alphabet
         self.BLANK_INDEX = 0
 
         self.SEQUENCE_SIZE = 30
