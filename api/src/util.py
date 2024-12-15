@@ -93,18 +93,18 @@ def preprocess_image_recognizer(img, box):
     h = ((lb[1] - lt[1]) + (rb[1] - rt[1])) / 2
 
     ratio = w / h
-    print(f'plate size ratio: {w} / {h} = {ratio}')
+    print(f'doc data size ratio: {w} / {h} = {ratio}')
 
     if ratio <= 2.6:
-        plate_img = cv2.warpPerspective(img, cv2.getPerspectiveTransform(box[2:], constants.PLATE_SQUARE),
+        doc_img = cv2.warpPerspective(img, cv2.getPerspectiveTransform(box[2:], constants.DOC_SQUARE),
                                         (constants.RECOGNIZER_IMAGE_W // 2, constants.RECOGNIZER_IMAGE_H * 2))
-        top = plate_img[:32, :]
-        bottom = plate_img[32:, :]
-        plate_img = hconcat_resize_min([top, bottom])
+        top = doc_img[:32, :]
+        bottom = doc_img[32:, :]
+        doc_img = hconcat_resize_min([top, bottom])
     else:
-        plate_img = cv2.warpPerspective(img, cv2.getPerspectiveTransform(box[2:], constants.PLATE_RECT),
+        doc_img = cv2.warpPerspective(img, cv2.getPerspectiveTransform(box[2:], constants.DOC_RECT),
                                         (constants.RECOGNIZER_IMAGE_W, constants.RECOGNIZER_IMAGE_H))
 
-    # cv2.imwrite("./image.jpg", plate_img)
-    return np.ascontiguousarray(np.stack([plate_img]).astype(np.float32).transpose(
+    # cv2.imwrite("./image.jpg", doc_img)
+    return np.ascontiguousarray(np.stack([doc_img]).astype(np.float32).transpose(
         constants.RECOGNIZER_IMG_CONFIGURATION) / constants.PIXEL_MAX_VALUE)

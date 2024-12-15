@@ -12,39 +12,39 @@ detector = DetectionEngine()
 recognizer = RecognitionEngine()
 
 
-def getPlates(img_orig, img_model, ax, ay):
+def getDocs(img_orig, img_model, ax, ay):
     # Проверка на RGB формат
     if img_orig.shape[2] != 3:
         raise ValueError("Ожидаются изображения в формате RGB с 3 каналами.")
 
     original_image_h, original_image_w, _ = img_orig.shape
-    plate_output = detector.predict(img_model)
-    plates = nms_np(plate_output[0], conf_thres=0.7, include_conf=True)
+    doc_output = detector.predict(img_model)
+    docs = nms_np(doc_output[0], conf_thres=0.7, include_conf=True)
 
     results = []
-    if len(plates) > 0:
-        plates[..., [4, 6, 8, 10]] += plates[..., [0]]
-        plates[..., [5, 7, 9, 11]] += plates[..., [1]]
-        ind = np.argsort(plates[..., -1])
-        plates = plates[ind]
+    if len(docs) > 0:
+        docs[..., [4, 6, 8, 10]] += docs[..., [0]]
+        docs[..., [5, 7, 9, 11]] += docs[..., [1]]
+        ind = np.argsort(docs[..., -1])
+        docs = docs[ind]
 
-        for plate in plates:
-            box = np.copy(plate[:12]).reshape(6, 2)  # 6 точек для описания рамки
+        for doc in docs:
+            box = np.copy(doc[:12]).reshape(6, 2)  # 6 точек для описания рамки
             box[:, ::2] *= (original_image_w + ax * 2) / DETECTION_IMAGE_W
             box[:, 1::2] *= (original_image_h + ay * 2) / DETECTION_IMAGE_H
 
             box[:, ::2] -= ax
             box[:, 1::2] -= ay
 
-            plate_img = preprocess_image_recognizer(img_orig, box)
-            plate_labels, probs = recognizer.predict(plate_img)
+            doc_img = preprocess_image_recognizer(img_orig, box)
+            doc_labels, probs = recognizer.predict(doc_img)
 
             # Определение типа объекта
-            label = plate_labels[0] if isinstance(plate_labels, list) and plate_labels else ""
+            label = doc_labels[0] if isinstance(doc_labels, list) and doc_labels else ""
             obj_type = "id" if label.isdigit() else "date of birth"
 
             results.append({
-                "label": plate_labels,
+                "label": doc_labels,
                 "type": obj_type,
                 "prob": probs,
                 "coords": {
@@ -82,7 +82,7 @@ async def analyze_route(request: Request):
         image = readb64(image_base64)
 
         img_orig, img_model, ax, ay = prepare_for_detector(image)
-        results = getPlates(img_orig, img_model, ax, ay)
+        results = getDocs(img_orig, img_model, ax, ay)
         t2 = time.time()
         process_time = t2 - t1
 

@@ -12,13 +12,13 @@ IMG_C = 3
 DETECTION_IMG_CONFIGURATION = (2, 0, 1)
 RECOGNIZER_IMG_CONFIGURATION = (0, 3, 1, 2)
 
-PLATE_RECT = np.array([
+DOC_RECT = np.array([
     [0, 0],
     [0, 32],
     [127, 0],
     [127, 31]], dtype='float32')
 
-PLATE_SQUARE = np.array([
+DOC_SQUARE = np.array([
     [0, 0],
     [0, 63],
     [63, 0],

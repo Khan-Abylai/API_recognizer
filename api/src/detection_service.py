@@ -36,30 +36,30 @@ class DetectionEngine(object):
     def predict(self, imgs):
         cuda_stream = cuda.stream()
         batch_size = 1
-        plate_output = np.empty((self.bbox_attrs, self.grid_h, self.grid_w), dtype=np.float32)
+        doc_output = np.empty((self.bbox_attrs, self.grid_h, self.grid_w), dtype=np.float32)
 
         cuda_imgs = cuda.to_device(imgs, cuda_stream)
-        cuda_plate_output = cuda.to_device(plate_output, cuda_stream)
+        cuda_doc_output = cuda.to_device(doc_output, cuda_stream)
 
-        bindings = [cuda_imgs.device_ctypes_pointer.value, cuda_plate_output.device_ctypes_pointer.value]
+        bindings = [cuda_imgs.device_ctypes_pointer.value, cuda_doc_output.device_ctypes_pointer.value]
 
         self.execution_context.execute_async(batch_size, bindings, cuda_stream.handle.value, None)
         cuda_stream.synchronize()
 
-        cuda_plate_output.copy_to_host(plate_output, stream=cuda_stream)
+        cuda_doc_output.copy_to_host(doc_output, stream=cuda_stream)
 
-        plate_output = plate_output.reshape(batch_size, self.bbox_attrs, self.grid_h, self.grid_w)
-        plate_output = np.transpose(plate_output, (0, 2, 3, 1))
+        doc_output = doc_output.reshape(batch_size, self.bbox_attrs, self.grid_h, self.grid_w)
+        doc_output = np.transpose(doc_output, (0, 2, 3, 1))
 
-        plate_output[..., :2] = sigmoid(plate_output[..., :2])
-        plate_output[..., -1] = sigmoid(plate_output[..., -1])
+        doc_output[..., :2] = sigmoid(doc_output[..., :2])
+        doc_output[..., -1] = sigmoid(doc_output[..., -1])
 
-        plate_output[..., 2:4] = np.exp(plate_output[..., 2:4])
-        plate_output[..., :2] = plate_output[..., :2] + self.x_y_offset
+        doc_output[..., 2:4] = np.exp(doc_output[..., 2:4])
+        doc_output[..., :2] = doc_output[..., :2] + self.x_y_offset
 
-        plate_output[..., :-1] = plate_output[..., :-1] * self.grid_size
+        doc_output[..., :-1] = doc_output[..., :-1] * self.grid_size
 
-        return plate_output.reshape(batch_size, self.grid_w * self.grid_h, self.bbox_attrs)
+        return doc_output.reshape(batch_size, self.grid_w * self.grid_h, self.bbox_attrs)
 
     def __create_inference_engine(self, weights_path):
         weights = np.fromfile(weights_path, dtype=np.float32)
