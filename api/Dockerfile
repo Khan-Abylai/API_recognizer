@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/tensorrt:20.09-py3
+FROM nvcr.io/nvidia/tensorrt:23.03-py3
 
 ENV TZ=Asia/Almaty
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

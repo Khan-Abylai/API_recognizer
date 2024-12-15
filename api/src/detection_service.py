@@ -8,7 +8,7 @@ from scipy.special import expit as sigmoid
 
 
 class DetectionEngine(object):
-    __MODELS_PATH = "../../../../../Project_iman/API_recognizer/api/src/models/detector_weights.np"
+    __MODELS_PATH = "./models/detector_weights.np"
     __ENGINE_NAME = 'detection.engine'
 
     def __init__(self, img_w=512, img_h=512, grid_size=16):
@@ -67,9 +67,9 @@ class DetectionEngine(object):
                 self.trt_logger) as builder, builder.create_network() as network, builder.create_builder_config() as builder_config:
             builder.max_batch_size = 1
             builder_config.max_workspace_size = 1 << 30
-            if builder.platform_has_fast_fp16:
-                builder_config.set_flag(trt.BuilderFlag.FP16)
-                print("FP16 precision established")
+            # if builder.platform_has_fast_fp16:
+            #     builder_config.set_flag(trt.BuilderFlag.FP16)
+            #     print("FP16 precision established")
             input_layer = network.add_input('data', trt.DataType.FLOAT, self.IMG_SIZES)
             kernel_size = (3, 3)
             stride = (1, 1)

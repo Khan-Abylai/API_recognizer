@@ -8,7 +8,7 @@ import constants
 
 class RecognitionEngine(object):
     __ENGINE_NAME = 'recognizer.engine'
-    __MODELS_PATH = "../../../../../Project_iman/API_recognizer/api/src/models/recognizer_lite.np"
+    __MODELS_PATH = "./models/recognizer_lite.np"
     __russian_alphabet = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
 
     def __init__(self, max_batch_size=2):
@@ -82,9 +82,9 @@ class RecognitionEngine(object):
 
         with trt.Builder(
                 self.trt_logger) as builder, builder.create_network() as network, builder.create_builder_config() as builder_config:
-            if builder.platform_has_fast_fp16:
-                print("fp 16 are using")
-                builder_config.set_flag(trt.BuilderFlag.FP16)
+            # if builder.platform_has_fast_fp16:
+            #     print("fp 16 are using")
+            #     builder_config.set_flag(trt.BuilderFlag.FP16)
 
             input_layer = network.add_input('data', trt.DataType.FLOAT, (constants.IMG_C,
                                                                          constants.RECOGNIZER_IMAGE_H,
