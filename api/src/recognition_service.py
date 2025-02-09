@@ -8,7 +8,7 @@ import constants
 
 class RecognitionEngine(object):
     __ENGINE_NAME = 'recognizer.engine'
-    __MODELS_PATH = "./models/recognizer_weights_full.np"
+    __MODELS_PATH = "models/recognizer_weights.np"
     __russian_alphabet = 'абвгдежзийклмнопрстуфхцчшщъыьэюя'
 
     def __init__(self, max_batch_size=2):

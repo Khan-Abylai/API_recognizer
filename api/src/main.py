@@ -6,6 +6,7 @@ from detection_service import DetectionEngine
 from recognition_service import RecognitionEngine
 from util import prepare_for_detector, nms_np, preprocess_image_recognizer
 from constants import DETECTION_IMAGE_H, DETECTION_IMAGE_W
+from tempalate_matching import check_label
 
 app = FastAPI()
 detector = DetectionEngine()
@@ -13,7 +14,6 @@ recognizer = RecognitionEngine()
 
 
 def getDocs(img_orig, img_model, ax, ay):
-    # Проверка на RGB формат
     if img_orig.shape[2] != 3:
         raise ValueError("Ожидаются изображения в формате RGB с 3 каналами.")
 
@@ -29,7 +29,7 @@ def getDocs(img_orig, img_model, ax, ay):
         docs = docs[ind]
 
         for doc in docs:
-            box = np.copy(doc[:12]).reshape(6, 2)  # 6 точек для описания рамки
+            box = np.copy(doc[:12]).reshape(6, 2)
             box[:, ::2] *= (original_image_w + ax * 2) / DETECTION_IMAGE_W
             box[:, 1::2] *= (original_image_h + ay * 2) / DETECTION_IMAGE_H
 
@@ -39,22 +39,22 @@ def getDocs(img_orig, img_model, ax, ay):
             doc_img = preprocess_image_recognizer(img_orig, box)
             doc_labels, probs = recognizer.predict(doc_img)
 
-            # Определение типа объекта
-            label = doc_labels[0] if isinstance(doc_labels, list) and doc_labels else ""
-            obj_type = "id" if label.isdigit() else "date of birth"
+            recognized_label = doc_labels[0] if doc_labels else ""
+            recognized_type, recognized_label = check_label(recognized_label)
 
-            results.append({
-                "label": doc_labels,
-                "type": obj_type,
-                "prob": probs,
-                "coords": {
-                    "center_x": str(box[0][0]), "center_y": str(box[0][1]), "width": str(box[1][0]),
-                    "height": str(box[1][1]), "left_top_x": str(box[2][0]), "left_top_y": str(box[2][1]),
-                    "left_bottom_x": str(box[3][0]), "left_bottom_y": str(box[3][1]), "right_top_x": str(box[4][0]),
-                    "right_top_y": str(box[4][1]), "right_bottom_x": str(box[5][0]),
-                    "right_bottom_y": str(box[5][1])
-                }
-            })
+            if recognized_type is not None:
+                results.append({
+                    "label": recognized_label,
+                    "type": recognized_type,
+                    "prob": probs,
+                    "coords": {
+                        "center_x": str(box[0][0]), "center_y": str(box[0][1]), "width": str(box[1][0]),
+                        "height": str(box[1][1]), "left_top_x": str(box[2][0]), "left_top_y": str(box[2][1]),
+                        "left_bottom_x": str(box[3][0]), "left_bottom_y": str(box[3][1]), "right_top_x": str(box[4][0]),
+                        "right_top_y": str(box[4][1]), "right_bottom_x": str(box[5][0]),
+                        "right_bottom_y": str(box[5][1])
+                    }
+                })
 
     return results
 
